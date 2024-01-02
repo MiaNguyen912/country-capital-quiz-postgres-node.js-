@@ -5,27 +5,25 @@ import pg from "pg";
 const app = express();
 const port = 3000;
 
+// connect to database and read data from database
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
   database: "world",
   password: "password",
-  port: 5432,
+  port: 5433,
 });
 
 db.connect();
 
-let quiz = [
-  { country: "France", capital: "Paris" },
-  { country: "United Kingdom", capital: "London" },
-  { country: "United States of America", capital: "New York" },
-];
+let quiz = [];
 
 db.query("SELECT * FROM capitals", (err, res) => {
   if (err) {
     console.error("Error executing query", err.stack);
   } else {
-    quiz = res.rows;
+    quiz = res.rows; //read the data from database into variable quiz
+    // console.log(quiz);
   }
   db.end();
 });
@@ -41,7 +39,7 @@ let currentQuestion = {};
 // GET home page
 app.get("/", async (req, res) => {
   totalCorrect = 0;
-  await nextQuestion();
+  await nextQuestion(); //nextQuestion get a random question from the quiz list
   console.log(currentQuestion);
   res.render("index.ejs", { question: currentQuestion });
 });
@@ -66,7 +64,6 @@ app.post("/submit", (req, res) => {
 
 async function nextQuestion() {
   const randomCountry = quiz[Math.floor(Math.random() * quiz.length)];
-
   currentQuestion = randomCountry;
 }
 
